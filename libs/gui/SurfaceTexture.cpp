@@ -258,6 +258,7 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool skipSync)
         }
 
         EGLImageKHR image = mEglSlots[buf].mEglImage;
+
 #ifdef DECIDE_TEXTURE_TARGET
                 // GPU is not efficient in handling GL_TEXTURE_EXTERNAL_OES
                 // texture target. Depending on the image format, decide,
