@@ -105,6 +105,10 @@ public:
     status_t lockYCbCr(uint32_t usage, android_ycbcr *ycbcr);
     status_t lockYCbCr(uint32_t usage, const Rect& rect, android_ycbcr *ycbcr);
     status_t unlock();
+#ifdef QCOM_BSP
+    status_t perform(buffer_handle_t hnd, int operation,
+                     uint32_t w, uint32_t h, PixelFormat format);
+#endif
 
     ANativeWindowBuffer* getNativeBuffer() const;
     

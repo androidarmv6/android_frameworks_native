@@ -118,6 +118,7 @@ private:
     int dispatchSetPostTransformCrop(va_list args);
     int dispatchSetUsage(va_list args);
 #ifdef QCOM_BSP
+    int dispatchUpdateBuffersGeometry(va_list args);
     int dispatchSetBuffersSize(va_list args);
 #endif
     int dispatchLock(va_list args);
@@ -131,6 +132,7 @@ protected:
     virtual int query(int what, int* value) const;
     virtual int setSwapInterval(int interval);
 #ifdef QCOM_BSP
+    virtual int updateBuffersGeometry(int w, int h, int f);
     virtual int setBuffersSize(int size);
 #endif
     virtual int lockBuffer_DEPRECATED(ANativeWindowBuffer* buffer);
