@@ -233,17 +233,16 @@ HWComposer::HWComposer(
     loadFbHalModule();
     loadHwcModule();
 
-    if (mFbDev && mHwc && hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1)) {
-        // close FB HAL if we don't needed it.
-        // FIXME: this is temporary until we're not forced to open FB HAL
-        // before HWC.
-        framebuffer_close(mFbDev);
-        mFbDev = NULL;
-    }
-
-    // If we have no HWC, or a pre-1.1 HWC, an FB dev is mandatory.
-    if ((!mHwc || !hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1))
-            && !mFbDev) {
+    if (mHwc && hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_1)) {
+	if (mFbDev) {
+            // close FB HAL if we don't needed it.
+            // FIXME: this is temporary until we're not forced to open FB HAL
+            // before HWC.
+            framebuffer_close(mFbDev);
+            mFbDev = NULL;
+	}
+    } else if (!mFbDev) {
+	// If we have no HWC, or a pre-1.1 HWC, an FB dev is mandatory.
         ALOGE("ERROR: failed to open framebuffer, aborting");
         abort();
     }
