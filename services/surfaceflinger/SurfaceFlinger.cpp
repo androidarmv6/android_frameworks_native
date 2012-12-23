@@ -101,7 +101,8 @@ SurfaceFlinger::SurfaceFlinger()
         mLastSwapBufferTime(0),
         mDebugInTransaction(0),
         mLastTransactionTime(0),
-        mBootFinished(false)
+        mBootFinished(false),
+        mUseDithering(0)
 {
     ALOGI("SurfaceFlinger is starting");
 
@@ -119,8 +120,13 @@ SurfaceFlinger::SurfaceFlinger()
             mDebugDDMS = 0;
         }
     }
+
+    property_get("persist.sys.use_dithering", value, "1");
+    mUseDithering = atoi(value);
+
     ALOGI_IF(mDebugRegion, "showupdates enabled");
     ALOGI_IF(mDebugDDMS, "DDMS debugging enabled");
+    ALOGI_IF(mUseDithering, "use dithering");
 }
 
 void SurfaceFlinger::onFirstRef()
@@ -417,7 +423,12 @@ void SurfaceFlinger::initializeGL(EGLDisplay display) {
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glEnableClientState(GL_VERTEX_ARRAY);
     glShadeModel(GL_FLAT);
-    glDisable(GL_DITHER);
+    if (mUseDithering == 0 || mUseDithering == 1) {
+        glDisable(GL_DITHER);
+    }
+    else if (mUseDithering == 2) {
+        glEnable(GL_DITHER);
+    }
     glDisable(GL_CULL_FACE);
 
     struct pack565 {

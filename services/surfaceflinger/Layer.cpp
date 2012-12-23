@@ -63,6 +63,7 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client)
         mFormat(PIXEL_FORMAT_NONE),
         mGLExtensions(GLExtensions::getInstance()),
         mOpaqueLayer(true),
+        mNeedsDithering(false),
         mSecure(false),
         mProtectedByApp(false)
 {
@@ -182,6 +183,10 @@ status_t Layer::setBuffers( uint32_t w, uint32_t h,
         return BAD_VALUE;
     }
 
+    // the display's pixel format
+    //sp<const DisplayDevice> hw(mFlinger->getDefaultDisplayDevice());
+    //getPixelFormatInfo(PixelFormat(hw->getFormat()), &info->pixelFormatInfo);
+
     mFormat = format;
 
     mSecure = (flags & ISurfaceComposerClient::eSecure) ? true : false;
@@ -192,6 +197,21 @@ status_t Layer::setBuffers( uint32_t w, uint32_t h,
     mSurfaceTexture->setDefaultBufferSize(w, h);
     mSurfaceTexture->setDefaultBufferFormat(format);
     mSurfaceTexture->setConsumerUsageBits(getEffectiveUsage(0));
+
+    int useDither = mFlinger->getUseDithering();
+    if (useDither) {
+        if (useDither == 2) {
+            mNeedsDithering = true;
+        }
+        else {
+            // we use the red index
+            //int displayRedSize = info->pixelFormatInfo->getSize(PixelFormatInfo::INDEX_RED);
+            //int layerRedsize = info->pixelFormatInfo->getSize(PixelFormatInfo::INDEX_RED);
+            mNeedsDithering = true; // (layerRedsize > displayRedSize);
+        }
+    } else {
+        mNeedsDithering = false;
+    }
 
     return NO_ERROR;
 }
