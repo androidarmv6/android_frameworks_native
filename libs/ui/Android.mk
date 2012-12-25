@@ -24,6 +24,12 @@ LOCAL_SRC_FILES:= \
 	Rect.cpp \
 	Region.cpp
 
+ifeq ($(BOARD_USES_ECLAIR_LIBCAMERA),true)
+LOCAL_SRC_FILES+= \
+	Overlay.cpp \
+	../../../av/camera/CameraParameters.cpp
+endif
+
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libutils \

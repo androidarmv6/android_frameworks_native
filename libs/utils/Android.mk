@@ -71,6 +71,9 @@ ifeq ($(HOST_OS), linux)
 LOCAL_SRC_FILES += Looper.cpp
 endif
 LOCAL_MODULE:= libutils
+ifeq ($(BOARD_USES_ECLAIR_LIBCAMERA),true)
+LOCAL_CFLAGS += -DLIBUTILS_NATIVE=1 $(TOOL_CFLAGS) -fpermissive
+endif
 LOCAL_STATIC_LIBRARIES := libz
 LOCAL_C_INCLUDES := \
 	external/zlib
