@@ -27,6 +27,11 @@ LOCAL_SRC_FILES:= \
 	Region.cpp \
 	UiConfig.cpp
 
+ifeq ($(BOARD_USES_ECLAIR_LIBCAMERA),true)
+LOCAL_SRC_FILES+= \
+	../../../av/camera/CameraParameters.cpp
+endif
+
 LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libhardware \
