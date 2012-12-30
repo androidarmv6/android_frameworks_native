@@ -50,6 +50,10 @@
 
 #include "DisplayHardware/HWComposer.h"
 
+#ifdef SAMSUNG_HDMI_SUPPORT
+#include "SecHdmiClient.h"
+#endif
+
 namespace android {
 
 // ---------------------------------------------------------------------------
@@ -462,6 +466,9 @@ private:
      */
 
     sp<IBinder> mExtDisplayToken;
+#if defined(SAMSUNG_HDMI_SUPPORT) && defined(SAMSUNG_EXYNOS5250)
+    SecHdmiClient *                         mHdmiClient;
+#endif
 };
 
 // ---------------------------------------------------------------------------
