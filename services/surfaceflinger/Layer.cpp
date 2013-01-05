@@ -414,17 +414,17 @@ void Layer::onDraw(const sp<const DisplayDevice>& hw, const Region& clip) const
         glMatrixMode(GL_TEXTURE);
         glLoadIdentity();
         glMatrixMode(GL_MODELVIEW);
+#ifdef DECIDE_TEXTURE_TARGET
+        glEnable(currentTextureTarget);
+#else
         glDisable(GL_TEXTURE_EXTERNAL_OES);
-        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_TEXTURE_2D);
+#endif
     }
 
     drawWithOpenGL(hw, clip);
-#ifdef DECIDE_TEXTURE_TARGET
-    glEnable(currentTextureTarget);
-#else
     glDisable(GL_TEXTURE_EXTERNAL_OES);
     glDisable(GL_TEXTURE_2D);
-#endif
 }
 
 // As documented in libhardware header, formats in the range
