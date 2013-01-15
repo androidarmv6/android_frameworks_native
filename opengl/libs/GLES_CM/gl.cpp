@@ -102,20 +102,39 @@ GL_API void GL_APIENTRY glWeightPointerOESBounds(GLint size, GLenum type,
             "mrc p15, 0, " #reg ", c13, c0, 3 \n"
     #else
         #define GET_TLS(reg) \
+        #ifdef BROADCOM_EGL
             "mov   " #reg ", #0xFFFF0FFF      \n"  \
             "ldr   " #reg ", [" #reg ", #-15] \n"
+        #else
+             "push  {r0,r1,r2,r3,lr}           \n"  \
+             "mov   " #reg ", #0xFFFF0FFF      \n"  \
+             "sub   " #reg "," #reg ",#0x1F    \n"  \
+             "blx   " #reg "                   \n"  \
+             "mov   " #reg ", r0               \n"  \
+             "pop   {r0,r1,r2,r3,lr}           \n"
+        #endif
     #endif
 
     #define API_ENTRY(_api) __attribute__((naked)) _api
 
     #define CALL_GL_API(_api, ...)                              \
          asm volatile(                                          \
+         #ifdef BROADCOM_EGL
+            GET_TLS(r12)                                        \
+            "cmp   r12, #0            \n"                       \
+            "ldrne   r12, [r12, %[tls]] \n"                     \
+            "cmpne   r12, #0          \n"                       \
+            "ldrne pc,  [r12, %[api]] \n"                       \
+            "mov   r0, #0             \n"                       \
+            "bx    lr                 \n"                       \
+         #else
             GET_TLS(r12)                                        \
             "ldr   r12, [r12, %[tls]] \n"                       \
             "cmp   r12, #0            \n"                       \
             "ldrne pc,  [r12, %[api]] \n"                       \
             "mov   r0, #0             \n"                       \
             "bx    lr                 \n"                       \
+         #endif
             :                                                   \
             : [tls] "J"(TLS_SLOT_OPENGL_API*4),                 \
               [api] "J"(__builtin_offsetof(gl_hooks_t, gl._api))    \
