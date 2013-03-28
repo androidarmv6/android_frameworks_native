@@ -243,6 +243,29 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool skipSync)
     if (err == NO_ERROR) {
         int buf = item.mBuf;
 
+#ifdef DECIDE_TEXTURE_TARGET
+        // GPU is not efficient in handling GL_TEXTURE_EXTERNAL_OES
+        // texture target. Depending on the image format, decide,
+        // the texture target to be used
+
+        if(isComposition){
+            switch (mSlots[buf].mGraphicBuffer->format) {
+                case HAL_PIXEL_FORMAT_RGBA_8888:
+                case HAL_PIXEL_FORMAT_RGBX_8888:
+                case HAL_PIXEL_FORMAT_RGB_888:
+                case HAL_PIXEL_FORMAT_RGB_565:
+                case HAL_PIXEL_FORMAT_BGRA_8888:
+                case HAL_PIXEL_FORMAT_RGBA_5551:
+                case HAL_PIXEL_FORMAT_RGBA_4444:
+                    mTexTarget = GL_TEXTURE_2D;
+                    break;
+                default:
+                    mTexTarget = GL_TEXTURE_EXTERNAL_OES;
+                    break;
+            }
+        }
+#endif
+
         // we call the rejecter here, in case the caller has a reason to
         // not accept this buffer. this is used by SurfaceFlinger to
         // reject buffers which have the wrong size
@@ -259,28 +282,6 @@ status_t SurfaceTexture::updateTexImage(BufferRejecter* rejecter, bool skipSync)
 
         EGLImageKHR image = mEglSlots[buf].mEglImage;
 
-#ifdef DECIDE_TEXTURE_TARGET
-                // GPU is not efficient in handling GL_TEXTURE_EXTERNAL_OES
-                // texture target. Depending on the image format, decide,
-                // the texture target to be used
-
-                if(isComposition){
-                    switch (mSlots[buf].mGraphicBuffer->format) {
-                        case HAL_PIXEL_FORMAT_RGBA_8888:
-                        case HAL_PIXEL_FORMAT_RGBX_8888:
-                        case HAL_PIXEL_FORMAT_RGB_888:
-                        case HAL_PIXEL_FORMAT_RGB_565:
-                        case HAL_PIXEL_FORMAT_BGRA_8888:
-                        case HAL_PIXEL_FORMAT_RGBA_5551:
-                        case HAL_PIXEL_FORMAT_RGBA_4444:
-                            mTexTarget = GL_TEXTURE_2D;
-                            break;
-                        default:
-                            mTexTarget = GL_TEXTURE_EXTERNAL_OES;
-                            break;
-                    }
-                }
-#endif
         glBindTexture(mTexTarget, mTexName);
         glEGLImageTargetTexture2DOES(mTexTarget, (GLeglImageOES)image);
 
