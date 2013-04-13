@@ -378,9 +378,6 @@ private:
         return mProtectedTexName;
     }
 
-    // 0: surface doesn't need dithering, 1: use if necessary, 2: use permanently
-    inline int  getUseDithering() const { return mUseDithering; }
-
     /* ------------------------------------------------------------------------
      * Display management
      */
@@ -451,7 +448,6 @@ private:
     volatile nsecs_t mDebugInTransaction;
     nsecs_t mLastTransactionTime;
     bool mBootFinished;
-    int mUseDithering;
     bool mPrefer16bpp;
 
     // these are thread safe

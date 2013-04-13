@@ -105,7 +105,6 @@ SurfaceFlinger::SurfaceFlinger()
         mDebugInTransaction(0),
         mLastTransactionTime(0),
         mBootFinished(false),
-        mUseDithering(0),
         mPrefer16bpp(0)
 {
     ALOGI("SurfaceFlinger is starting");
@@ -125,15 +124,11 @@ SurfaceFlinger::SurfaceFlinger()
         }
     }
 
-    property_get("persist.sys.use_dithering", value, "1");
-    mUseDithering = atoi(value);
-
     property_get("persist.sys.prefer_16bpp", value, "1");
     mPrefer16bpp = atoi(value);
 
     ALOGI_IF(mDebugRegion, "showupdates enabled");
     ALOGI_IF(mDebugDDMS, "DDMS debugging enabled");
-    ALOGI_IF(mUseDithering, "use dithering");
 
 #ifdef SAMSUNG_HDMI_SUPPORT
     ALOGD(">>> Run service");
@@ -439,12 +434,7 @@ void SurfaceFlinger::initializeGL(EGLDisplay display) {
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glEnableClientState(GL_VERTEX_ARRAY);
     glShadeModel(GL_FLAT);
-    if (mUseDithering == 0 || mUseDithering == 1) {
-        glDisable(GL_DITHER);
-    }
-    else if (mUseDithering == 2) {
-        glEnable(GL_DITHER);
-    }
+    glDisable(GL_DITHER);
     glDisable(GL_CULL_FACE);
 
     struct pack565 {

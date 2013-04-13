@@ -77,7 +77,6 @@ public:
     virtual uint32_t doTransaction(uint32_t transactionFlags);
     virtual Region latchBuffer(bool& recomputeVisibleRegions);
     virtual bool isOpaque() const;
-    virtual bool needsDithering() const     { return mNeedsDithering; }
     virtual bool isSecure() const           { return mSecure; }
     virtual bool isProtected() const;
     virtual void onRemoved();
@@ -143,7 +142,6 @@ private:
     PixelFormat mFormat;
     const GLExtensions& mGLExtensions;
     bool mOpaqueLayer;
-    bool mNeedsDithering;
 
     // page-flip thread (currently main thread)
     bool mSecure;         // no screenshots
