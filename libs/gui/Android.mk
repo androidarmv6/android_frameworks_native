@@ -55,6 +55,10 @@ ifeq ($(BOARD_EGL_NEEDS_LEGACY_FB),true)
     endif
 endif
 
+ifeq ($(TARGET_QCOM_DISPLAY_VARIANT),legacy)
+	LOCAL_CFLAGS += -DUSE_LEGACY_SCREENSHOT
+endif
+
 LOCAL_MODULE:= libgui
 
 ifeq ($(TARGET_BOARD_PLATFORM), tegra)

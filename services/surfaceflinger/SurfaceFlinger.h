@@ -190,7 +190,7 @@ private:
             const sp<IGraphicBufferProducer>& producer,
             uint32_t reqWidth, uint32_t reqHeight,
             uint32_t minLayerZ, uint32_t maxLayerZ, bool isCpuConsumer);
-#ifdef BOARD_EGL_NEEDS_LEGACY_FB
+#if defined(BOARD_EGL_NEEDS_LEGACY_FB) || defined(USE_LEGACY_SCREENSHOT)
     virtual status_t captureScreen(const sp<IBinder>& display, sp<IMemoryHeap>* heap,
         uint32_t* width, uint32_t* height, uint32_t reqWidth,
         uint32_t reqHeight, uint32_t minLayerZ, uint32_t maxLayerZ);
@@ -316,7 +316,7 @@ private:
 
     status_t captureScreenImplCpuConsumerLocked(
             const sp<const DisplayDevice>& hw,
-#ifdef BOARD_EGL_NEEDS_LEGACY_FB
+#if defined(BOARD_EGL_NEEDS_LEGACY_FB) || defined(USE_LEGACY_SCREENSHOT)
             sp<IMemoryHeap>* heap, uint32_t* width, uint32_t* height,
 #else
             const sp<IGraphicBufferProducer>& producer,
