@@ -526,6 +526,7 @@ status_t HWComposer::setVirtualDisplayProperties(int32_t id,
 #ifndef QCOM_HARDWARE
     if (id < VIRTUAL_DISPLAY_ID_BASE) {
         return BAD_INDEX;
+    }
 #endif
     if (id >= int32_t(mNumDisplays) || !mAllocatedDisplayIDs.hasBit(id)) {
         return BAD_INDEX;
