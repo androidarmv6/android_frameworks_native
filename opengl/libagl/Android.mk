@@ -45,6 +45,12 @@ ifeq ($(ARCH_ARM_HAVE_TLS_REGISTER),true)
     LOCAL_CFLAGS += -DHAVE_ARM_TLS_REGISTER
 endif
 
+ifneq ($(TARGET_LIBAGL_USE_GRALLOC_COPYBITS),)
+    LOCAL_CFLAGS += -DLIBAGL_USE_GRALLOC_COPYBITS
+    LOCAL_SRC_FILES += copybit.cpp
+    LOCAL_SHARED_LIBRARIES += libui
+endif
+
 # we need to access the private Bionic header <bionic_tls.h>
 # on ARM platforms, we need to mirror the ARCH_ARM_HAVE_TLS_REGISTER
 # behavior from the bionic Android.mk file
