@@ -523,7 +523,7 @@ void egl_window_surface_v2_t::copyBlt(
         region_iterator it(clip);
         err = copybit->blit(copybit, &dimg, &simg, &it);
         if (err != NO_ERROR) {
-            LOGE("copybit failed (%s)", strerror(err));
+            ALOGE("copybit failed (%s)", strerror(err));
          }
     }
 
