@@ -31,7 +31,7 @@
 
 #include <hardware/gralloc.h>
 #include <hardware/copybit.h>
-#include <private/ui/android_natives_priv.h>
+#include <ui/ANativeObjectBase.h>
 
 #include <ui/GraphicBuffer.h>
 #include <ui/Region.h>
@@ -120,13 +120,13 @@ static bool checkContext(ogles_context_t* c) {
 	// avoid checking the same information again.
 	
     if (c->copybits.blitEngine == NULL) {
-        LOGD_IF(DEBUG_COPYBIT, "no copybit hal");
+        ALOGD_IF(DEBUG_COPYBIT, "no copybit hal");
         return false;
     }
 
     if (c->rasterizer.state.enables
                     & (GGL_ENABLE_DEPTH_TEST|GGL_ENABLE_FOG)) {
-        LOGD_IF(DEBUG_COPYBIT, "depth test and/or fog");
+        ALOGD_IF(DEBUG_COPYBIT, "depth test and/or fog");
         return false;
     }
 
@@ -139,7 +139,7 @@ static bool checkContext(ogles_context_t* c) {
     EGLTextureObject* textureObject = u.texture;
 
     if (!supportedCopybitsFormat(textureObject->surface.format)) {
-        LOGD_IF(DEBUG_COPYBIT, "texture format not supported");
+        ALOGD_IF(DEBUG_COPYBIT, "texture format not supported");
         return false;
     }
     return true;
@@ -189,12 +189,12 @@ static bool copybit(GLint x, GLint y,
     int32_t texelArea = gglMulx(dtdy, dsdx);
     if (texelArea < FIXED_ONE && textureObject->mag_filter != GL_LINEAR) {
         // Non-linear filtering on a texture enlargement.
-        LOGD_IF(DEBUG_COPYBIT, "mag filter is not GL_LINEAR");
+        ALOGD_IF(DEBUG_COPYBIT, "mag filter is not GL_LINEAR");
         return false;
     }
     if (texelArea > FIXED_ONE && textureObject->min_filter != GL_LINEAR) {
         // Non-linear filtering on an texture shrink.
-        LOGD_IF(DEBUG_COPYBIT, "min filter is not GL_LINEAR");
+        ALOGD_IF(DEBUG_COPYBIT, "min filter is not GL_LINEAR");
         return false;
     }
 #endif
@@ -228,7 +228,7 @@ static bool copybit(GLint x, GLint y,
                 && c->rasterizer.state.blend.dst == GL_ONE_MINUS_SRC_ALPHA
                 && c->rasterizer.state.blend.alpha_separate == 0)) {
             // Incompatible blend mode.
-            LOGD_IF(DEBUG_COPYBIT, "incompatible blend mode");
+            ALOGD_IF(DEBUG_COPYBIT, "incompatible blend mode");
             return false;
         }
         blending = true;
@@ -244,7 +244,7 @@ static bool copybit(GLint x, GLint y,
             opFormat = COPYBIT_FORMAT_RGBX_8888;
         } else {
             if (srcTextureHasAlpha) {
-                LOGD_IF(DEBUG_COPYBIT, "texture format requires blending");
+                ALOGD_IF(DEBUG_COPYBIT, "texture format requires blending");
                 return false;
             }
         }
@@ -267,11 +267,11 @@ static bool copybit(GLint x, GLint y,
                 break;
             }
         }
-        LOGD_IF(DEBUG_COPYBIT, "GGL_MODULATE");
+        ALOGD_IF(DEBUG_COPYBIT, "GGL_MODULATE");
         return false;
     default:
         // Incompatible texture environment.
-        LOGD_IF(DEBUG_COPYBIT, "incompatible texture environment");
+        ALOGD_IF(DEBUG_COPYBIT, "incompatible texture environment");
         return false;
     }
 
@@ -296,7 +296,7 @@ static bool copybit(GLint x, GLint y,
     {
         // The requested scale is out of the range the hardware
         // can support.
-        LOGD_IF(DEBUG_COPYBIT,
+        ALOGD_IF(DEBUG_COPYBIT,
                 "scale out of range dsdx=%08x (Wcr=%d / w=%d), "
                 "dtdy=%08x (Hcr=%d / h=%d), Ucr=%d, Vcr=%d",
                 dsdx, Wcr, w, dtdy, Hcr, h, Ucr, Vcr);
@@ -316,7 +316,7 @@ static bool copybit(GLint x, GLint y,
 
         if (dsdx < maxScaleInv || dsdx > minScaleInv ||
             dtdy < maxScaleInv || dtdy > minScaleInv) {
-            LOGD_IF(DEBUG_COPYBIT,
+            ALOGD_IF(DEBUG_COPYBIT,
                     "scale out of range dsdx=%08x (Wcr=%d / w=%d), "
                     "dtdy=%08x (Hcr=%d / h=%d), Ucr=%d, Vcr=%d",
                     dsdx, Wcr, w, dtdy, Hcr, h, Ucr, Vcr);
@@ -326,7 +326,7 @@ static bool copybit(GLint x, GLint y,
         const int tmp_w = gglMulx(srect.r - srect.l, xscale, 16);
         const int tmp_h = gglMulx(srect.b - srect.t, yscale, 16);
 
-        LOGD_IF(DEBUG_COPYBIT,
+        ALOGD_IF(DEBUG_COPYBIT,
                 "xscale=%08x, yscale=%08x, dsdx=%08x, dtdy=%08x, tmp_w=%d, tmp_h=%d",
                 xscale, yscale, dsdx, dtdy, tmp_w, tmp_h);
 
@@ -440,7 +440,7 @@ static bool copybit(GLint x, GLint y,
                         COPYBIT_ENABLE : COPYBIT_DISABLE);
         clipRectRegion it(c);
 
-        LOGD_IF(0,
+        ALOGD_IF(0,
              "dst={%d, %d, %d, %p, %p}, "
              "src={%d, %d, %d, %p, %p}, "
              "drect={%d,%d,%d,%d}, "
@@ -491,7 +491,7 @@ bool drawTriangleFanWithCopybit_impl(ogles_context_t* c, GLint first, GLsizei co
     int t = max(v0.y, v2.y);
     if ((l != min(v1.x, v3.x)) || (b != min(v1.y, v3.y)) ||
         (r != max(v1.x, v3.x)) || (t != max(v1.y, v3.y))) {
-        LOGD_IF(DEBUG_COPYBIT, "geometry not a rectangle");
+        ALOGD_IF(DEBUG_COPYBIT, "geometry not a rectangle");
         return false;
     }
 
@@ -517,13 +517,13 @@ bool drawTriangleFanWithCopybit_impl(ogles_context_t* c, GLint first, GLsizei co
     int txt = max(t0.y, t2.y);
     if ((txl != min(t1.x, t3.x)) || (txb != min(t1.y, t3.y)) ||
         (txr != max(t1.x, t3.x)) || (txt != max(t1.y, t3.y))) {
-        LOGD_IF(DEBUG_COPYBIT, "texcoord not a rectangle");
+        ALOGD_IF(DEBUG_COPYBIT, "texcoord not a rectangle");
         return false;
     }
     if ((txl != 0) || (txb != 0) ||
         (txr != FIXED_ONE) || (txt != FIXED_ONE)) {
         // we could probably handle this case, if we wanted to
-        LOGD_IF(DEBUG_COPYBIT, "texture is cropped: %08x,%08x,%08x,%08x",
+        ALOGD_IF(DEBUG_COPYBIT, "texture is cropped: %08x,%08x,%08x,%08x",
                 txl, txb, txr, txt);
         return false;
     }
@@ -577,8 +577,8 @@ bool drawTriangleFanWithCopybit_impl(ogles_context_t* c, GLint first, GLsizei co
             transform |= COPYBIT_TRANSFORM_FLIP_V;
     }
 
-    //LOGD("l=%d, b=%d, w=%d, h=%d, tr=%d", x, y, w, h, transform);
-    //LOGD("A=%f\tB=%f\nC=%f\tD=%f",
+    //ALOGD("l=%d, b=%d, w=%d, h=%d, tr=%d", x, y, w, h, transform);
+    //ALOGD("A=%f\tB=%f\nC=%f\tD=%f",
     //      dsdx/65536.0, dtdx/65536.0, dsdy/65536.0, dtdy/65536.0);
 
     int x = l >> 4;
@@ -615,4 +615,6 @@ bool drawTexiOESWithCopybit_impl(GLint x, GLint y, GLint z,
 }
 
 } // namespace android
+
+
 
