@@ -208,7 +208,10 @@ void SurfaceFlinger::onFirstRef()
 SurfaceFlinger::~SurfaceFlinger()
 {
     EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+#ifndef BCM_HARDWARE
+    // Not sure if we need to disable this on Broadcom...
     eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+#endif
     eglTerminate(display);
 }
 
@@ -352,12 +355,18 @@ status_t SurfaceFlinger::selectConfigForAttribute(
     eglGetConfigs(dpy, NULL, 0, &numConfigs);
     EGLConfig* const configs = new EGLConfig[numConfigs];
     eglChooseConfig(dpy, attrs, configs, numConfigs, &n);
+#ifdef BCM_HARDWARE
+    ALOGE("eglChooseConfig %d",n);
+#endif
 
     if (n) {
         if (attribute != EGL_NONE) {
             for (int i=0 ; i<n ; i++) {
                 EGLint value = 0;
                 eglGetConfigAttrib(dpy, configs[i], attribute, &value);
+#ifdef BCM_HARDWARE
+                ALOGE("get attrib %d %d", wanted, value);
+#endif
                 if (wanted == value) {
                     *outConfig = configs[i];
                     delete [] configs;
