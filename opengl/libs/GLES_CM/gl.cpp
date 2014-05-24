@@ -98,13 +98,24 @@ GL_API void GL_APIENTRY glWeightPointerOESBounds(GLint size, GLenum type,
         #define GET_TLS(reg) \
             "mrc p15, 0, " #reg ", c13, c0, 3 \n"
     #else
+#ifndef BCM_HARDWARE
         #define GET_TLS(reg) \
             "mov   " #reg ", #0xFFFF0FFF      \n"  \
             "ldr   " #reg ", [" #reg ", #-15] \n"
+#else
+        #define GET_TLS(reg) \
+            "push   {r0,r1,r2,r3,lr}          \n"  \
+            "mov   " #reg ", #0xFFFF0FFF      \n"  \
+            "sub  " #reg "," #reg ",#0x1F     \n"  \
+            "blx   " #reg "                   \n"  \
+            "mov   " #reg ", r0               \n"  \
+            "pop    {r0,r1,r2,r3,lr}          \n"
+#endif
     #endif
 
     #define API_ENTRY(_api) __attribute__((noinline)) _api
 
+#ifndef BCM_HARDWARE
     #define CALL_GL_API(_api, ...)                              \
          asm volatile(                                          \
             GET_TLS(r12)                                        \
@@ -116,6 +127,20 @@ GL_API void GL_APIENTRY glWeightPointerOESBounds(GLint size, GLenum type,
               [api] "J"(__builtin_offsetof(gl_hooks_t, gl._api))    \
             :                                                   \
             );
+#else
+    #define CALL_GL_API(_api, ...)                              \
+         asm volatile(                                          \
+            GET_TLS(r12)                                        \
+            "cmp   r12, #0            \n"                       \
+            "ldrne   r12, [r12, %[tls]] \n"                     \
+            "cmpne   r12, #0            \n"                     \
+            "ldrne pc,  [r12, %[api]] \n"                       \
+            :                                                   \
+            : [tls] "J"(TLS_SLOT_OPENGL_API*4),                 \
+              [api] "J"(__builtin_offsetof(gl_hooks_t, gl._api))    \
+            :                                                   \
+            );
+#endif
 
 #elif defined(__mips__) && !USE_SLOW_BINDING
 
