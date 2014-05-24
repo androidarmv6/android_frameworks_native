@@ -99,8 +99,18 @@ GL_API void GL_APIENTRY glWeightPointerOESBounds(GLint size, GLenum type,
             "mrc p15, 0, " #reg ", c13, c0, 3 \n"
     #else
         #define GET_TLS(reg) \
+#ifdef BCM_HARDWARE
+            "push   {r0,r1,r2,r3,lr}          \n"  \
+#endif
             "mov   " #reg ", #0xFFFF0FFF      \n"  \
+#ifndef BCM_HARDWARE
             "ldr   " #reg ", [" #reg ", #-15] \n"
+#else
+            "sub  " #reg "," #reg ",#0x1F     \n"  \
+            "blx   " #reg "                   \n"  \
+            "mov   " #reg ", r0               \n"  \
+            "pop    {r0,r1,r2,r3,lr}          \n"
+#endif
     #endif
 
     #define API_ENTRY(_api) __attribute__((noinline)) _api
@@ -108,8 +118,14 @@ GL_API void GL_APIENTRY glWeightPointerOESBounds(GLint size, GLenum type,
     #define CALL_GL_API(_api, ...)                              \
          asm volatile(                                          \
             GET_TLS(r12)                                        \
+#ifndef BCM_HARDWARE
             "ldr   r12, [r12, %[tls]] \n"                       \
+#endif
             "cmp   r12, #0            \n"                       \
+#ifdef BCM_HARDWARE
+            "ldrne   r12, [r12, %[tls]] \n"                     \
+            "cmpne   r12, #0            \n"                     \
+#endif
             "ldrne pc,  [r12, %[api]] \n"                       \
             :                                                   \
             : [tls] "J"(TLS_SLOT_OPENGL_API*4),                 \
