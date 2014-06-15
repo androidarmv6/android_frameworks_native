@@ -168,7 +168,7 @@ struct egl_surface_t
     virtual     EGLBoolean  swapBuffers();
     virtual     EGLBoolean  setSwapRectangle(EGLint l, EGLint t, EGLint w, EGLint h);
 #ifdef BCM_HARDWARE
-    virtual     EGLClientBuffer  getRenderBuffer();
+    virtual     EGLClientBuffer getRenderBuffer() const;
 #endif
 protected:
     GGLSurface              depth;
@@ -214,9 +214,8 @@ EGLBoolean egl_surface_t::setSwapRectangle(
     return EGL_FALSE;
 }
 #ifdef BCM_HARDWARE
-EGLClientBuffer egl_surface_t::getRenderBuffer()
-{
-    return NULL;
+EGLClientBuffer egl_surface_t::getRenderBuffer() const {
+    return 0;
 }
 #endif
 
@@ -245,7 +244,7 @@ struct egl_window_surface_v2_t : public egl_surface_t
     virtual     EGLint      getSwapBehavior() const;
     virtual     EGLBoolean  setSwapRectangle(EGLint l, EGLint t, EGLint w, EGLint h);
 #ifdef BCM_HARDWARE
-    virtual     EGLClientBuffer  getRenderBuffer();
+    virtual     EGLClientBuffer  getRenderBuffer() const;
 #endif
     
 private:
@@ -594,9 +593,9 @@ EGLBoolean egl_window_surface_v2_t::setSwapRectangle(
 }
 
 #ifdef BCM_HARDWARE
-EGLClientBuffer egl_window_surface_v2_t::getRenderBuffer()
+EGLClientBuffer egl_window_surface_v2_t::getRenderBuffer() const
 {
-    return const_cast<native_handle*>(buffer->handle);
+    return buffer;
 }
 #endif
 
