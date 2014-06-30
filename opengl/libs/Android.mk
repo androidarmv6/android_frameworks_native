@@ -62,6 +62,11 @@ ifeq ($(ARCH_ARM_HAVE_TLS_REGISTER),true)
   LOCAL_CFLAGS += -DHAVE_ARM_TLS_REGISTER
 endif
 
+ifeq ($(BOARD_EGL_SYSTEMUI_PBSIZE_HACK),true)
+  # see Loader.cpp for details
+  LOCAL_CFLAGS += -DSYSTEMUI_PBSIZE_HACK=1
+endif
+
 ifeq ($(BOARD_EGL_WORKAROUND_BUG_10194508),true)
   LOCAL_CFLAGS += -DWORKAROUND_BUG_10194508=1
 endif
@@ -76,6 +81,10 @@ endif
 
 ifneq ($(MAX_EGL_CACHE_SIZE),)
   LOCAL_CFLAGS += -DMAX_EGL_CACHE_SIZE=$(MAX_EGL_CACHE_SIZE)
+endif
+
+ifeq ($(BOARD_USE_BGRA_8888),true)
+  LOCAL_CFLAGS += -DUSE_BGRA_8888=1
 endif
 
 LOCAL_REQUIRED_MODULES := $(egl.cfg_config_module)

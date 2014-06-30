@@ -496,6 +496,19 @@ private:
     bool mUseDithering;
     int mPrefer16bpp;
 
+    // Set if the Gpu Tile render DR optimization enabled
+    bool mGpuTileRenderEnable;
+#ifdef QCOM_BSP
+    // Find out if GPU composition can use Dirtyregion optimization
+    // Get the mode individual layer Dirty rect / union dirty rect to operate &
+    // the dirty region
+    bool computeTiledDr(const sp<const DisplayDevice>& hw,Rect& dirtyRect);
+    enum {
+       GL_PRESERVE_NONE = 0,
+       GL_PRESERVE      = 1
+    };
+#endif
+
     // these are thread safe
     mutable MessageQueue mEventQueue;
     FrameTracker mAnimFrameTracker;
