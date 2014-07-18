@@ -1296,6 +1296,11 @@ EGLBoolean eglReleaseThread(void)
 {
     clearError();
 
+#if EGL_TRACE
+    if (getEGLDebugLevel() > 0)
+        GLTrace_eglReleaseThread();
+#endif
+
     // If there is context bound to the thread, release it
     egl_display_t::loseCurrent(get_context(getContext()));
 
@@ -1303,12 +1308,7 @@ EGLBoolean eglReleaseThread(void)
     if (cnx->dso && cnx->egl.eglReleaseThread) {
         cnx->egl.eglReleaseThread();
     }
-
     egl_tls_t::clearTLS();
-#if EGL_TRACE
-    if (getEGLDebugLevel() > 0)
-        GLTrace_eglReleaseThread();
-#endif
     return EGL_TRUE;
 }
 
