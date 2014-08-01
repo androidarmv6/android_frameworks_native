@@ -1096,11 +1096,9 @@ public:
         bool forceSkip = false;
         // PREMULT on the statusbar layer will artifact miserably on VERSION_03
         // due to the translucency, so skip compositing
-#ifndef BCM_HARDWARE
         if (getLayer()->blending == HWC_BLENDING_PREMULT && isStatusBar(getLayer())) {
             forceSkip = true;
         }
-#endif
         if (alpha < 0xFF || forceSkip) {
             getLayer()->flags |= HWC_SKIP_LAYER;
         }
