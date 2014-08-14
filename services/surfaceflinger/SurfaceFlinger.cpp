@@ -368,18 +368,12 @@ status_t SurfaceFlinger::selectConfigForAttribute(
     eglGetConfigs(dpy, NULL, 0, &numConfigs);
     EGLConfig* const configs = new EGLConfig[numConfigs];
     eglChooseConfig(dpy, attrs, configs, numConfigs, &n);
-#ifdef BCM_HARDWARE
-    ALOGE("eglChooseConfig %d",n);
-#endif
 
     if (n) {
         if (attribute != EGL_NONE) {
             for (int i=0 ; i<n ; i++) {
                 EGLint value = 0;
                 eglGetConfigAttrib(dpy, configs[i], attribute, &value);
-#ifdef BCM_HARDWARE
-                ALOGE("egl: get attrib %d %d %d %d", wanted, value, i, n);
-#endif
                 if (wanted == value) {
                     *outConfig = configs[i];
                     delete [] configs;
@@ -392,14 +386,6 @@ status_t SurfaceFlinger::selectConfigForAttribute(
             delete [] configs;
             return NO_ERROR;
         }
-#ifdef BCM_HARDWARE
-        // Broadcom fails to select a config. This doesn't seem to be a big deal on
-        // ICS, but it breaks on KitKat. This is a workaround, but needs to be checked
-        // in more detail.
-        *outConfig = configs[wanted];
-        delete [] configs;
-        return NO_ERROR;
-#endif
     }
     delete [] configs;
     return NAME_NOT_FOUND;
@@ -591,12 +577,10 @@ void SurfaceFlinger::init() {
         err = selectEGLConfig(mEGLDisplay, mHwc->getVisualID(), 0, &mEGLConfig);
     }
 
-#ifndef BCM_HARDWARE
     if (err != NO_ERROR) {
         // this EGL is too lame for android
         LOG_ALWAYS_FATAL("no suitable EGLConfig found, giving up");
     }
-#endif
 
     // print some debugging info
     EGLint r,g,b,a;
