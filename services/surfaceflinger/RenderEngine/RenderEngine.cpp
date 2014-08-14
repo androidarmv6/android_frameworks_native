@@ -106,9 +106,7 @@ RenderEngine* RenderEngine::create(EGLDisplay display, EGLConfig config) {
     ALOGI("GL_MAX_TEXTURE_SIZE = %d", engine->getMaxTextureSize());
     ALOGI("GL_MAX_VIEWPORT_DIMS = %d", engine->getMaxViewportDims());
 
-#ifndef BCM_HARDWARE
     eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-#endif
     eglDestroySurface(display, dummy);
 
     return engine;
@@ -134,9 +132,7 @@ void RenderEngine::checkErrors() const {
         GLenum error = glGetError();
         if (error == GL_NO_ERROR)
             break;
-#ifndef BCM_HARDWARE
         ALOGE("GL error 0x%04x", int(error));
-#endif
     } while (true);
 }
 
