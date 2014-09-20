@@ -687,6 +687,14 @@ EGLBoolean eglDestroyContext(EGLDisplay dpy, EGLContext ctx)
         return setError(EGL_BAD_CONTEXT, EGL_FALSE);
 
     egl_context_t * const c = get_context(ctx);
+
+#ifdef BCM_HARDWARE
+    if (getContext() != EGL_NO_CONTEXT) {
+        ALOGE("%s: trying to destroy active context - clearing before we destroy", __FUNCTION__);
+        eglMakeCurrent(dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    }
+#endif
+
     EGLBoolean result = c->cnx->egl.eglDestroyContext(dp->disp.dpy, c->context);
     if (result == EGL_TRUE) {
         _c.terminate();
