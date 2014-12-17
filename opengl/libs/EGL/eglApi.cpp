@@ -126,6 +126,12 @@ static const extention_map_t sExtensionMap[] = {
             (__eglMustCastToProperFunctionPointerType)&eglCreateImageKHR },
     { "eglDestroyImageKHR",
             (__eglMustCastToProperFunctionPointerType)&eglDestroyImageKHR },
+#ifdef BCM_HARDWARE
+    { "eglGetRenderBufferANDROID",
+        (__eglMustCastToProperFunctionPointerType)&eglGetRenderBufferANDROID },
+    { "eglGetComposerANDROID",
+        (__eglMustCastToProperFunctionPointerType)&eglGetComposerANDROID },
+#endif
 
     // EGL_KHR_reusable_sync, EGL_KHR_fence_sync
     { "eglCreateSyncKHR",
@@ -1476,6 +1482,41 @@ EGLBoolean eglSignalSyncKHR(EGLDisplay dpy, EGLSyncKHR sync, EGLenum mode) {
     }
     return result;
 }
+
+#ifdef BCM_HARDWARE
+EGLClientBuffer eglGetRenderBufferANDROID(EGLDisplay dpy, EGLSurface draw)
+{
+    clearError();
+
+    const egl_display_ptr dp = validate_display(dpy);
+    if (!dp) return EGL_FALSE;
+
+    egl_surface_t const * const s = get_surface(draw);
+
+    egl_connection_t* const cnx = &gEGLImpl;
+    if (cnx->dso && cnx->egl.eglGetRenderBufferANDROID) {
+        return cnx->egl.eglGetRenderBufferANDROID(dp->disp.dpy, s->surface);
+    }
+    return setError(EGL_BAD_DISPLAY, (EGLClientBuffer*)0);
+}
+
+void* eglGetComposerANDROID(EGLDisplay dpy, EGLSurface draw)
+{
+    clearError();
+
+    const egl_display_ptr dp = validate_display(dpy);
+    if (!dp) return EGL_FALSE;
+
+    egl_surface_t const * const s = get_surface(draw);
+
+    egl_connection_t* const cnx = &gEGLImpl;
+    if (cnx->dso && cnx->egl.eglGetComposerANDROID) {
+        return (void*)cnx->egl.eglGetComposerANDROID(
+                dp->disp.dpy, s->surface);
+    }
+    return setError(EGL_BAD_DISPLAY, (EGLClientBuffer*)0);
+}
+#endif
 
 EGLint eglClientWaitSyncKHR(EGLDisplay dpy, EGLSyncKHR sync,
         EGLint flags, EGLTimeKHR timeout)
