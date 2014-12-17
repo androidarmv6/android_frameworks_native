@@ -221,6 +221,10 @@ typedef EGLBoolean (EGLAPIENTRYP PFNEGLFENCENVPROC) (EGLSyncNV sync);
 typedef EGLint (EGLAPIENTRYP PFNEGLCLIENTWAITSYNCNVPROC) (EGLSyncNV sync, EGLint flags, EGLTimeNV timeout);
 typedef EGLBoolean (EGLAPIENTRYP PFNEGLSIGNALSYNCNVPROC) (EGLSyncNV sync, EGLenum mode);
 typedef EGLBoolean (EGLAPIENTRYP PFNEGLGETSYNCATTRIBNVPROC) (EGLSyncNV sync, EGLint attribute, EGLint *value);
+#ifdef BCM_HARDWARE
+typedef EGLClientBuffer (EGLAPIENTRYP PFNEGLGETRENDERBUFFERANDROIDPROC) (EGLDisplay dpy, EGLSurface draw);
+typedef EGLClientBuffer (EGLAPIENTRYP PFNEGLGETCOMPOSERANDROIDPROC) (EGLDisplay dpy, EGLSurface draw);
+#endif
 #endif
 #endif
 
@@ -528,6 +532,17 @@ typedef void (EGLAPIENTRYP PFNEGLSETBLOBCACHEFUNCSANDROIDPROC)(EGLDisplay dpy, E
 EGLAPI EGLint EGLAPIENTRY eglDupNativeFenceFDANDROID( EGLDisplay dpy, EGLSyncKHR);
 #endif /* EGL_EGLEXT_PROTOTYPES */
 typedef EGLint (EGLAPIENTRYP PFNEGLDUPNATIVEFENCEFDANDROIDPROC)(EGLDisplay dpy, EGLSyncKHR);
+#endif
+
+#ifdef BCM_HARDWARE
+#ifndef EGL_ANDROID_get_render_buffer
+#define EGL_ANDROID_get_render_buffer 1
+#ifdef EGL_EGLEXT_PROTOTYPES
+EGLAPI EGLClientBuffer EGLAPIENTRY eglGetRenderBufferANDROID(EGLDisplay dpy, EGLSurface draw);
+EGLAPI void* EGLAPIENTRY eglGetComposerANDROID(EGLDisplay dpy, EGLSurface draw);
+#endif
+typedef EGLClientBuffer (EGLAPIENTRYP PFNEGLGETRENDERBUFFERANDROIDPROC) (EGLDisplay dpy, EGLSurface draw);
+#endif
 #endif
 
 #ifndef EGL_ANDROID_recordable
